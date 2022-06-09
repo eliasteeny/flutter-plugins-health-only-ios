@@ -46,6 +46,10 @@ class HealthFactory {
   ///
   ///   On Android, this function returns true or false, depending on whether the specified access right has been granted.
   static Future<bool?> hasPermissions(List<HealthDataType> types, {List<HealthDataAccess>? permissions}) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
+
     if (permissions != null && permissions.length != types.length)
       throw ArgumentError("The lists of types and permissions must be of same length.");
 
@@ -69,6 +73,9 @@ class HealthFactory {
   /// [requestPermissions] with all the data types once. Otherwise iOS HealthKit
   /// will ask to approve every permission one by one in separate screens.
   static Future<bool?> requestPermissions(List<HealthDataType> types) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
     return await _channel.invokeMethod('requestPermissions', {
       "types": types.map((type) => _enumToString(type)).toList(),
     });
@@ -78,6 +85,9 @@ class HealthFactory {
   ///
   /// Not supported on iOS and method does nothing.
   static Future<void> revokePermissions() async {
+    if (_platformType == PlatformType.ANDROID) {
+      return;
+    }
     return await _channel.invokeMethod('revokePermissions');
   }
 
@@ -96,6 +106,9 @@ class HealthFactory {
     List<HealthDataType> types, {
     List<HealthDataAccess>? permissions,
   }) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
     if (permissions != null && permissions.length != types.length) {
       throw ArgumentError('The length of [types] must be same as that of [permissions].');
     }
@@ -119,6 +132,9 @@ class HealthFactory {
     List<HealthDataType> types, {
     List<HealthDataAccess>? permissions,
   }) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
     if (permissions != null && permissions.length != types.length) {
       throw ArgumentError('The length of [types] must be same as that of [permissions].');
     }
@@ -199,6 +215,9 @@ class HealthFactory {
     DateTime startTime,
     DateTime endTime,
   ) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
     if (startTime.isAfter(endTime)) throw ArgumentError("startTime must be equal or earlier than endTime");
     Map<String, dynamic> args = {
       'value': value,
@@ -221,6 +240,9 @@ class HealthFactory {
     required DateTime startTime,
     required DateTime endTime,
   }) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
     bool? success = await _channel.invokeMethod('deleteNutritionData', {
       'startTime': startTime.millisecondsSinceEpoch,
       'endTime': endTime.millisecondsSinceEpoch,
@@ -280,6 +302,9 @@ class HealthFactory {
     double? dietaryVitaminK,
     double? dietaryZinc,
   }) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return false;
+    }
     if (startTime.isAfter(endTime)) throw ArgumentError("startTime must be equal or earlier than endTime");
     Map<String, dynamic> args = {
       'startTime': startTime.millisecondsSinceEpoch,
@@ -366,6 +391,9 @@ class HealthFactory {
 
   /// The main function for fetching health data
   Future<List<HealthDataPoint>> _dataQuery(DateTime startDate, DateTime endDate, HealthDataType dataType) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return <HealthDataPoint>[];
+    }
     final args = <String, dynamic>{
       'dataTypeKey': _enumToString(dataType),
       'startDate': startDate.millisecondsSinceEpoch,
@@ -446,6 +474,9 @@ class HealthFactory {
     DateTime startDate,
     DateTime endDate,
   ) async {
+    if (_platformType == PlatformType.ANDROID) {
+      return -1;
+    }
     final args = <String, dynamic>{
       'startDate': startDate.millisecondsSinceEpoch,
       'endDate': endDate.millisecondsSinceEpoch
